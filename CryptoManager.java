@@ -1,67 +1,56 @@
 /*
  * Class: CMSC203 
- * Instructor: Tanveen
+ * Instructor: Tanveer
  * Description: Encrypt and decrypt
  * Due: 3/18/2023
  * I pledge that I have completed the programming 
  * assignment independently. I have not copied the code 
  * from a student or any source. I have not given my code 
  * to any student.
-   Print your Name here: Harlene Kaur
-*/
+ * Print your Name here: Harlene Kaur
+ */
 
 public class CryptoManager {
-	
-	private static final char LOWER_RANGE = ' ';
-	private static final char UPPER_RANGE = '_';
-	private static final int RANGE = UPPER_RANGE - LOWER_RANGE + 1;
+
+	private static final char LOWER_BOUND = ' ';
+	private static final char UPPER_BOUND = '_';
+	private static final int RANGE = UPPER_BOUND - LOWER_BOUND + 1;
 
 	/**
 	 * This method determines if a string is within the allowable bounds of ASCII codes 
-	 * according to the LOWER_RANGE and UPPER_RANGE characters
-	 * @param plainText a string to be encrypted, if it is within the allowable bounds
+	 * according to the LOWER_BOUND and UPPER_BOUND characters
+	 * @param text a string to be checked, if it is within the allowable bounds
 	 * @return true if all characters are within the allowable bounds, false if any character is outside
 	 */
-	public static boolean isStringInBounds (String text) {
-		throw new RuntimeException("method not implemented");
-		boolean bound;
-		bound = false;
-		for (int i= 0; i < text.length(); i++)
-		{
-			if (text.charAt(i) >= LOWER_BOUND && text.charAt(i) <= UPPER_BOUND)
-			{
-				bound = true;
+	public static boolean isStringInBounds(String text) {
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) < LOWER_BOUND || text.charAt(i) > UPPER_BOUND) {
+				return false;
 			}
 		}
-		return bound;
+		return true;
 	}
 
 	/**
 	 * Encrypts a string according to the Caesar Cipher.  The integer key specifies an offset
-	 * and each character in plainText is replaced by the character \"offset\" away from it 
+	 * and each character in plainText is replaced by the character "offset" away from it 
 	 * @param plainText an uppercase string to be encrypted.
 	 * @param key an integer that specifies the offset of each character
 	 * @return the encrypted string
 	 */
 	public static String caesarEncryption(String plainText, int key) {
-		throw new RuntimeException("method not implemented");
-		String encryptedTxt = " ";
-		if (isStringInBounds(plainText))
-		{
-			for (int i=0; i < plainText.length(); i++)
-			{
-				char userChar = plainText.charAt(i);
-				int encryptedChar = ((int)userChar + key);
-				while (encryptedChar > UPPER_BOUND)
-				{
-					encryptedChar -= RANGE;
-				}
-				encryptedTxt += (char)encryptedChar;
-			}
+		if (!isStringInBounds(plainText)) {
+			throw new IllegalArgumentException("The input string contains characters outside the allowable bounds.");
 		}
-		return encryptedTxt;
+		String encryptedText = "";
+		for (int i = 0; i < plainText.length(); i++) {
+			char c = plainText.charAt(i);
+			int shifted = (c - LOWER_BOUND + key) % RANGE + LOWER_BOUND;
+			encryptedText += (char) shifted;
+		}
+		return encryptedText;
 	}
-	
+
 	/**
 	 * Encrypts a string according the Bellaso Cipher.  Each character in plainText is offset 
 	 * according to the ASCII value of the corresponding character in bellasoStr, which is repeated
@@ -70,69 +59,62 @@ public class CryptoManager {
 	 * @param bellasoStr an uppercase string that specifies the offsets, character by character.
 	 * @return the encrypted string
 	 */
-	public static String bellasoEncryption (String plainText, String bellasoStr) {
-		throw new RuntimeException("method not implemented");
-		int bellasoStrLen = bellasoStr.length();
-		String encryptedTxt = " ";
-		for(int i = 0; i < plainText.length(); i++)
-		{
-			char userChar = plainText.charAt(i);
-			int encryptedCharint = ((int)userChar+(int)bellasoStr.charAt(i%bellasoStrLen));
-			while (encryptedCharint > (int)UPPER_BOUND)
-			{
-				encryptedCharint -= RANGE;
-			}
-			encryptedTxt += (char)encryptedCharint;
+	public static String bellasoEncryption(String plainText, String bellasoStr) {
+		if (!isStringInBounds(plainText) || !isStringInBounds(bellasoStr)) {
+			throw new IllegalArgumentException("The input string contains characters outside the allowable bounds.");
 		}
-		return encryptedTxt;
+		String encryptedText = "";
+		int bellasoStrLen = bellasoStr.length();
+		for (int i = 0; i < plainText.length(); i++) {
+			char c = plainText.charAt(i);
+			char keyChar = bellasoStr.charAt(i % bellasoStrLen);
+			int shifted = (c + keyChar) % RANGE + LOWER_BOUND;
+			encryptedText += (char) shifted;
+		}
+		return encryptedText;
 	}
-	
+
 	/**
 	 * Decrypts a string according to the Caesar Cipher.  The integer key specifies an offset
-	 * and each character in encryptedText is replaced by the character \"offset\" characters before it.
-	 * This is the inverse of the encryptCaesar method.
+	 * and each character in encryptedText is replaced by the character "offset" characters before it.
+	 * This is the inverse* function of the caesarEncryption function.
 	 * @param encryptedText an encrypted string to be decrypted.
 	 * @param key an integer that specifies the offset of each character
-	 * @return the plain text string
+	 * @return the decrypted string
 	 */
-	public static String caesarDecryption (String encryptedText, int key) {
-		throw new RuntimeException("method not implemented");
-		String decryptedTxt = " ";
-		for(int i = 0; i < encryptedText.length(); i++)
-		{
-			char userChar = encrypterText.charAt(i);
-			int decryptedChar = ((int)userChar-key);
-			while (decryptedChar < LOWER_BOUND)
-			{
-				decryptedChar += RANGE;
-			}
-			decryptedTxt += (char)decryptedChar;
+	public static String caesarDecryption(String encryptedText, int key) {
+		if (!isStringInBounds(encryptedText)) {
+			throw new IllegalArgumentException("The input string contains characters outside the allowable bounds.");
 		}
-		return decryptedTxt;
+		String decryptedText = "";
+		for (int i = 0; i < encryptedText.length(); i++) {
+			char c = encryptedText.charAt(i);
+			int shifted = (c - LOWER_BOUND - key + RANGE) % RANGE + LOWER_BOUND;
+			decryptedText += (char) shifted;
+		}
+		return decryptedText;
 	}
-	
 	/**
-	 * Decrypts a string according the Bellaso Cipher.  Each character in encryptedText is replaced by
-	 * the character corresponding to the character in bellasoStr, which is repeated
-	 * to correspond to the length of plainText.  This is the inverse of the encryptBellaso method.
+	 * Decrypts a string according the Bellaso Cipher.  Each character in encryptedText is replaced 
+	 * by the character corresponding to the ASCII value of the corresponding character in bellasoStr, 
+	 * which is repeated to correspond to the length of plainText.
+	 * This is the inverse function of the bellasoEncryption function.
 	 * @param encryptedText an uppercase string to be encrypted.
 	 * @param bellasoStr an uppercase string that specifies the offsets, character by character.
 	 * @return the decrypted string
 	 */
 	public static String bellasoDecryption(String encryptedText, String bellasoStr) {
-		throw new RuntimeException("method not implemented");
-		String decryptedTxt = " ";
-		int bellasoStrLen = bellasoStr.length();
-		for (int i = 0; i < encryptedText.length(); i++)
-		{
-			char userChar = encryptedText.charAt(i);
-			int decryptedChar = ((int)userChar -(int)bellasoStr.charAt(i%bellasoStrLen));
-			while (decryptedChar < (int)LOWER_BOUND)
-			{
-				decryptedChar += RANGE;
-			}
-			decryptedTxt += (char)decryptedChar;
+		if (!isStringInBounds(encryptedText) || !isStringInBounds(bellasoStr)) {
+			throw new IllegalArgumentException("The input string contains characters outside the allowable bounds.");
 		}
-		return decryptedTxt;
+		String decryptedText = "";
+		int bellasoStrLen = bellasoStr.length();
+		for (int i = 0; i < encryptedText.length(); i++) {
+			char c = encryptedText.charAt(i);
+			char keyChar = bellasoStr.charAt(i % bellasoStrLen);
+			int shifted = (c - keyChar + RANGE) % RANGE + LOWER_BOUND;
+			decryptedText += (char) shifted;
+		}
+		return decryptedText;
 	}
 }
